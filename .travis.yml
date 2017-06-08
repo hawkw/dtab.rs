@@ -24,3 +24,22 @@ jobs:
           repo: hawkw/dtab
           os: linux
           rust: stable
+    - stage: publish
+      env:
+        - secure: "M7kcmTEqBVeizNW0N3z7HRs+rierQtiQg59fzCZF91arPaA+koeG5iItNKsSEu5iy6b7tmzK4pIFDTlu946pRsnOFMoBIrtP/lmBgdT3LGz8qOgOhcdWrtQAqwudib0xZ4HyLiTg928SJ26IHihlZSIjgUmJZBoQgEuexgkjmoOpyZoWTBDHD3RAjaRzt+On4LHudc3bNn+hYZ1pYdhAFfIxdU5flGJyXYre+pAtyGgHcTpy4qVuMB/j2a1khc6SCgwZuyCRz6u/yjPj2Jz/WMoTi01vE5AOpuFj4czk1PnQq5yirAXqVERMR7nQ0K95/zT0TKjGxa5G+hqjbIUxgB5y8r/EWnJ4xA2fYVBseIIU3Rj3QxpkAaOdW2EfzS3GhPD1gf/M8TnhVjhURcSzPUTKawa1LMVGixsEilVFMcOowNXnGAHkhThn/5IHXouyBgJv1eda5vRk36vkuopvP6E6YKBWflgnGJOyKRMu7LmXzDaDU3ZIJ+aD0Lw6EBJ104WlJ3F1X7/c3lZH9DwhaA6zeyHDRIXFI9F/F4Xm2v7pqU/Mndl+4WNNT89bX3lKd27wCF/vCQaGJwF6ZLgeBvYnEyWjsbBSrT2ZKlykUiiWtbwT0BOVvbPsGsvFTARHl1tKeYomSm3ymFMSrjOGCR5fOk4zBxTlwg2GS6QwcS8="
+      script: cargo package && cargo publish --token "$CRATES_TOKEN"
+      deploy:
+        provider: releases
+        api-key: $GH_TOKEN
+        file: target/package/dtab-$TRAVIS_TAG.crate
+        skip_cleanup: true
+        on:
+          tags: true
+          branch: master
+          repo: hawkw/dtab
+          os: linux
+          rust: stable
+
+env:
+  global:
+    - secure: secure: "Sg+BnE7gRUsop2h4V/H6Km75hCHUvF7bhh9Cv4v6dRX/nkCof3J3CM5XrTtpC79KU5UeZSqtrIdtonWDMF85coJLeQMublj6/wMoFt4HmOCBRrJSGGiEUDZltHTwYJw8GCvEwBA9zOCH8pBJER8MuTkOfVI8aBO+s2uDxyt7iLgk93RztvONSwOwDGuGwhvKR93lC6sPqMqwNPd8b4PPs15/nS7AW/gLg5aVZa0fdXK0aJpR1CCdvtjyZP61wrydO40TFh0RePzq34aNvc44QsSemSplsCQAWUtjYnrPumoiGJhBvTH0ubsaA0uGXjA6pwerI3VrfjR68FwonVJXFw4ywoFOatMzlgMRUS4ADEq0156YJ6SkR2hMKyFJIKFLCUcF9G5rUZ9cj7+BogbF8lEg3oyQ/uN+iCGXjMjIZKM+4HFQz7veCmI3jWYh5zuJTY4R7sss5iMwo/uY+NwriAohleWXKbkt4bmZGst5qWGdpJkuqM59vQ7VA2gParEJ1/HvprIm4DAqbL8VF0dyxExCQsSrmQpufLMgp5hmG+l8gLl8KSaBLq2/TZJCE7I+ZLhHhmdk8ap3jvU3ROjgYwpgxXoXrRP2y7iUBRoK5ElVhKWRA2KqyIugHUSBRGXK22Nh3EgfQ1V4ebYEIkIcR6hAXDnaXfiBhkDnlCR+K+w="

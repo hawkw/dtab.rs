@@ -19,5 +19,11 @@ serde_derive = "1.0"
 [dev-dependencies]
 pretty_assertions = "0.2.0"
 
-[badges]
-travis-ci = { repository = "github.com/hawkw/dtab.rs", branch = "master" }
+[badges.travis-ci]
+repository = "http://github.com/hawkw/dtab.rs"
+branch = "master"
+
+[badges.codecov]
+repository = "http://github.com/hawkw/dtab.rs"
+branch = "master"
+service = "github"

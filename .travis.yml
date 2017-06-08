@@ -27,7 +27,8 @@ jobs:
     - stage: publish
       env:
         - secure: "M7kcmTEqBVeizNW0N3z7HRs+rierQtiQg59fzCZF91arPaA+koeG5iItNKsSEu5iy6b7tmzK4pIFDTlu946pRsnOFMoBIrtP/lmBgdT3LGz8qOgOhcdWrtQAqwudib0xZ4HyLiTg928SJ26IHihlZSIjgUmJZBoQgEuexgkjmoOpyZoWTBDHD3RAjaRzt+On4LHudc3bNn+hYZ1pYdhAFfIxdU5flGJyXYre+pAtyGgHcTpy4qVuMB/j2a1khc6SCgwZuyCRz6u/yjPj2Jz/WMoTi01vE5AOpuFj4czk1PnQq5yirAXqVERMR7nQ0K95/zT0TKjGxa5G+hqjbIUxgB5y8r/EWnJ4xA2fYVBseIIU3Rj3QxpkAaOdW2EfzS3GhPD1gf/M8TnhVjhURcSzPUTKawa1LMVGixsEilVFMcOowNXnGAHkhThn/5IHXouyBgJv1eda5vRk36vkuopvP6E6YKBWflgnGJOyKRMu7LmXzDaDU3ZIJ+aD0Lw6EBJ104WlJ3F1X7/c3lZH9DwhaA6zeyHDRIXFI9F/F4Xm2v7pqU/Mndl+4WNNT89bX3lKd27wCF/vCQaGJwF6ZLgeBvYnEyWjsbBSrT2ZKlykUiiWtbwT0BOVvbPsGsvFTARHl1tKeYomSm3ymFMSrjOGCR5fOk4zBxTlwg2GS6QwcS8="
-      script: cargo package && cargo publish --token "$CRATES_TOKEN"
+      script: skip
+      before_deploy: cargo package && cargo publish --token "$CRATES_TOKEN"
       deploy:
         provider: releases
         api-key: $GH_TOKEN

@@ -1,3 +1,13 @@
+<a name="0.0.2"></a>
+### 0.0.2 (2017-06-08)
+
+
+#### Bug Fixes
+
+* **Cargo.toml:**  fix repository URL in Cargo.toml ([31b60a5e](https://github.com/hawkw/dtab.rs/commit/31b60a5e4fd9575ed47137dcae821733d0622740))
+
+
+
 <a name="0.0.1"></a>
 ### 0.0.1 (2017-06-08)
 

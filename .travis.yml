@@ -11,8 +11,6 @@ script: cargo test
 
 jobs:
   include:
-    - stage: build
-      script: cargo build
     - stage: docs
       script: cargo doc
       deploy:

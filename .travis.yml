@@ -21,7 +21,7 @@ jobs:
         local_dir: target/doc
         on:
           branch: master
-          repo: hawkw/dtab
+          repo: hawkw/dtab.rs
           # os: linux
           rust: stable
     - stage: publish
@@ -36,7 +36,7 @@ jobs:
         on:
           tags: true
           branch: master
-          repo: hawkw/dtab
+          repo: hawkw/dtab.rs
           # os: linux
           rust: stable
 

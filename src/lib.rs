@@ -82,7 +82,7 @@ macro_rules! dentry {
 #[macro_export]
 macro_rules! dtab {
   ($($src: expr => $dst: expr ;)+) => (
-    Dtab(vec![ $(dentry!($src => $dst)),+ ])
+    $crate::Dtab(vec![ $(dentry!($src => $dst)),+ ])
   )
 }
 /// A `dtab` (delegation table) comprises a sequence of delegation rules.

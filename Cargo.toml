@@ -4,7 +4,7 @@ version = "0.0.1"
 authors = ["Eliza Weisman <eliza@elizas.website>"]
 readme = "README.md"
 license = "MIT"
-repository = "github.com/hawkw/dtab.rs"
+repository = "https://github.com/hawkw/dtab.rs"
 description = "a library for parsing and constructing Finagle/Linkerd delegation tables"
 # [dependencies.nom]
 # version = "^3.0"

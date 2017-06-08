@@ -3,19 +3,8 @@ rust:
   - stable
   - beta
   - nightly
-# os:
-#   - linux
-#   - osx
-matrix:
-  allow_failures:
-    - rust: nightly
-  fast_failures: true
-
-
-
 
 script: cargo test
-
 
 jobs:
   include:

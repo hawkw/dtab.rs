@@ -1,0 +1,28 @@
+language: rust
+rust:
+  - stable
+  - beta
+  - nightly
+os:
+  - linux
+  - osx
+
+script: cargo test
+
+jobs:
+  include:
+    - stage: build
+      script: cargo build
+    - stage: docs
+      script: cargo doc
+      deploy:
+        provider:  pages
+        skip_cleanup: true
+        github_token: $GH_TOKEN
+        target_branch: gh-pages
+        local_dir: target/doc
+        on:
+          branch: master
+          repo: hawkw/dtab
+          os: linux
+          rust: stable

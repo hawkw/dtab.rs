@@ -19,6 +19,8 @@ extern crate serde;
 use std::fmt;
 
 pub mod nametree;
+pub mod path;
+
 pub use self::nametree::*;
 
 

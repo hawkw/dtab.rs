@@ -20,9 +20,10 @@
 //! expression:
 //!
 //! ```
-//! use dtab::NameTree;
+//! use dtab::{NameTree, Prefix};
+//! use std::str::FromStr;
 //!
-//! let dentry = NameTree::from("/iceCreamStore") >> "/smitten";
+//! let dentry = Prefix::from_str("/iceCreamStore").unwrap() >> "/smitten";
 //! assert_eq!("/iceCreamStore => /smitten;", &dentry.to_string());
 //! ```
 //!
@@ -47,9 +48,10 @@
 //! becomes
 //!
 //! ```
-//! use dtab::NameTree;
+//! use dtab::{NameTree, Prefix};
+//! use std::str::FromStr;
 //!
-//! let dentry = NameTree::from("/iceCreamStore") >>
+//! let dentry = Prefix::from_str("/iceCreamStore").unwrap() >>
 //!              (NameTree::from("/humphrys") | "/smitten");
 //! assert_eq!("/iceCreamStore => /humphrys | /smitten;", &dentry.to_string());
 //! ```
@@ -57,11 +59,12 @@
 //! These alternation expressions can have any number of alternates, as in:
 //!
 //! ```
-//! use dtab::NameTree;
+//! use dtab::{NameTree, Prefix};
+//! use std::str::FromStr;
 //!
 //! let dest = NameTree::from("/humphrys") | "/smitten" | "/birite"
 //!                   | "/three-twins";
-//! let dentry = NameTree::from("/iceCreamStore") >> dest;
+//! let dentry = Prefix::from_str("/iceCreamStore").unwrap() >> dest;
 //! assert_eq!(
 //!   "/iceCreamStore => /humphrys | /smitten | /birite | /three-twins;"
 //! , &dentry.to_string()
@@ -71,10 +74,11 @@
 //! Union expressions can be constructed using the `&` operator:
 //!
 //! ```
-//! use dtab::NameTree;
+//! use dtab::{NameTree, Prefix};
+//! use std::str::FromStr;
 //!
 //! let dest = NameTree::from("/smitten") & "/humphrys";
-//! let dentry = NameTree::from("/iceCreamStore") >> dest;
+//! let dentry = Prefix::from_str("/iceCreamStore").unwrap() >> dest;
 //!
 //! assert_eq!( "/iceCreamStore => 0.5 * /smitten & 0.5 * /humphrys;"
 //!            , &dentry.to_string());
@@ -86,11 +90,12 @@
 //! Weighted unions can be constructed using the `*` operator:
 //!
 //! ```
-//! use dtab::NameTree;
+//! use dtab::{NameTree, Prefix};
+//! use std::str::FromStr;
 //! use dtab::nametree::W;
 //!
 //! let dest = W(0.7) * "/smitten" & W(0.3) * "/humphrys";
-//! let dentry = NameTree::from("/iceCreamStore") >> dest;
+//! let dentry = Prefix::from_str("/iceCreamStore").unwrap() >> dest;
 //! assert_eq!( "/iceCreamStore => 0.7 * /smitten & 0.3 * /humphrys;"
 //!            , &dentry.to_string());
 //! ```
@@ -104,14 +109,15 @@
 //! failure, and empty `NameTree` nodes, rather than leaf nodes:
 //!
 //! ```
-//! use dtab::NameTree;
+//! use dtab::{NameTree, Prefix};
+//! use std::str::FromStr;
 //!
-//! let dentry = NameTree::from("/iceCreamStore") >>
+//! let dentry = Prefix::from_str("/iceCreamStore").unwrap() >>
 //!              (NameTree::from("~") | "/smitten");
 //! assert_eq!( "/iceCreamStore => ~ | /smitten;"
 //!            , &dentry.to_string());
 //!
-//! let dentry = NameTree::from("/iceCreamStore") >>
+//! let dentry = Prefix::from_str("/iceCreamStore").unwrap() >>
 //!              (NameTree::from("/smitten") | "!");
 //! assert_eq!( "/iceCreamStore => /smitten | !;"
 //!            , &dentry.to_string());
@@ -123,14 +129,15 @@
 //! explictly:
 //!
 //! ```
-//! use dtab::NameTree;
+//! use dtab::{NameTree, Prefix};
+//! use std::str::FromStr;
 //!
-//! let dentry = NameTree::from("/iceCreamStore") >>
+//! let dentry = Prefix::from_str("/iceCreamStore").unwrap() >>
 //!             (NameTree::Neg | "/smitten");
 //! assert_eq!( "/iceCreamStore => ~ | /smitten;"
 //!            , &dentry.to_string());
 //!
-//! let dentry = NameTree::from("/iceCreamStore") >>
+//! let dentry = Prefix::from_str("/iceCreamStore").unwrap() >>
 //!              (NameTree::from("/smitten") | NameTree::Fail);
 //! assert_eq!( "/iceCreamStore => /smitten | !;"
 //!            , &dentry.to_string());
@@ -252,14 +259,6 @@ where R: convert::Into<NameTree<String>> {
     #[inline] fn mul(self, rhs: R) -> Self::Output {
         let W(w) = self;
         Weighted { weight: w, tree: Box::new(rhs.into()) }
-    }
-}
-
-impl<R> ops::Shr<R> for NameTree<String>
-where R: convert::Into<NameTree<String>> {
-    type Output = Dentry;
-    #[inline] fn shr(self, rhs: R) -> Self::Output {
-        Dentry { prefix: self, dst: rhs.into() }
     }
 }
 

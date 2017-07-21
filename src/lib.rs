@@ -26,6 +26,7 @@ pub mod path;
 pub mod prefix;
 
 pub use self::nametree::*;
+pub use self::prefix::Prefix;
 
 
 /// Macro for constructing a [`Dentry`].
@@ -46,7 +47,8 @@ pub use self::nametree::*;
 /// use dtab::NameTree;
 ///
 /// let dentry = dentry!( "/iceCreamStore" =>
-///     NameTree::from("/smitten") | "/humphrys" | "/birite" | "/three-twins" );
+///     NameTree::from("/smitten") | "/humphrys" | "/birite" | "/three-twins"
+///  ).unwrap();
 ///
 /// assert_eq!(
 ///   "/iceCreamStore => /smitten | /humphrys | /birite | /three-twins;"
@@ -57,9 +59,14 @@ pub use self::nametree::*;
 ///
 #[macro_export]
 macro_rules! dentry {
-  ($src: expr => $dst: expr ) => ($crate::Dentry {
-      prefix: $crate::NameTree::from($src), dst: $dst
-  })
+  ($src: expr => $dst: expr ) => ({
+    use std::str::FromStr;
+    $crate::Prefix::from_str($src)
+        .map(|src| $crate::Dentry {
+                prefix: src, dst: $dst
+            })
+
+    })
 }
 
 /// Convenience macro for making [`Dtab`]s.
@@ -74,7 +81,7 @@ macro_rules! dentry {
 /// let dtab = dtab![
 ///   "/smitten"       => NameTree::from("/USA/CA/SF/Harrison/2790");
 ///   "/iceCreamStore" => NameTree::from("/humphrys") | "/smitten";
-/// ];
+/// ].unwrap();
 ///
 ///
 /// assert_eq!( &format!("{}", dtab)
@@ -88,7 +95,9 @@ macro_rules! dentry {
 #[macro_export]
 macro_rules! dtab {
   ($($src: expr => $dst: expr ;)+) => (
-    $crate::Dtab(vec![ $(dentry!($src => $dst)),+ ])
+    vec![ $(dentry!($src => $dst)),+ ].into_iter()
+        .collect::<Result<Vec<$crate::Dentry>,$crate::prefix::ParseElemErr>>()
+        .map($crate::Dtab)
   )
 }
 /// A `dtab` (delegation table) comprises a sequence of delegation rules.
@@ -108,8 +117,8 @@ impl fmt::Display for Dtab {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct Dentry {
-    #[serde(serialize_with ="nametree::serialize")]
-    pub prefix: NameTree<String>
+    #[serde(serialize_with ="prefix::serialize")]
+    pub prefix: Prefix
   , #[serde(serialize_with ="nametree::serialize")]
     pub dst: NameTree<String>
 }
@@ -117,5 +126,15 @@ pub struct Dentry {
 impl fmt::Display for Dentry {
     #[inline] fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{} => {};", self.prefix, self.dst)
+    }
+}
+
+use std::{convert, ops};
+
+impl<R> ops::Shr<R> for Prefix
+where R: convert::Into<NameTree<String>> {
+    type Output = Dentry;
+    #[inline] fn shr(self, rhs: R) -> Self::Output {
+        Dentry { prefix: self, dst: rhs.into() }
     }
 }

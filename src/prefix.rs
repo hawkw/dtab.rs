@@ -1,9 +1,9 @@
 use std::str::FromStr;
-use std::fmt;
+use std::{fmt, ops, convert};
 
 use regex::Regex;
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Prefix(Vec<Elem>);
 
 impl FromStr for Prefix {
@@ -25,12 +25,18 @@ impl fmt::Display for Prefix {
     }
 }
 
+use serde::ser::{Serializer};
+pub fn serialize<S>(prefix: &Prefix, serializer: S)
+                    -> Result<S::Ok, S::Error>
+where S: Serializer {
+    serializer.serialize_str(&format!("{}", prefix))
+}
 
 // TODO: record invalid char position
 #[derive(Clone, Debug)]
 pub struct ParseElemErr { failed: String }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Elem {
     /// a label
     Label(String)

@@ -12,7 +12,8 @@ description = "a library for parsing and constructing Finagle/Linkerd delegation
 # features = ["regexp"]
 
 [dependencies]
-# regex = "^0.2.2"
+lazy_static = "0.2"
+regex = "0.2"
 serde = "1.0"
 serde_derive = "1.0"
 

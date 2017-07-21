@@ -9,6 +9,9 @@
 #[macro_use]
 extern crate pretty_assertions;
 
+extern crate regex;
+#[macro_use] extern crate lazy_static;
+
 extern crate serde;
 #[macro_use] extern crate serde_derive;
 //
@@ -20,6 +23,7 @@ use std::fmt;
 
 pub mod nametree;
 pub mod path;
+pub mod prefix;
 
 pub use self::nametree::*;
 

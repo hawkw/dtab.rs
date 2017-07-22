@@ -5,9 +5,10 @@
 //! dtabs cannot be represented, rather than just representing them as strings.
 //!
 //! [dtab]: https://linkerd.io/in-depth/dtabs/
+#![feature(try_from)]
+#![feature(ascii_ext)]
 #[cfg(test)]
-#[macro_use]
-extern crate pretty_assertions;
+#[macro_use] extern crate pretty_assertions;
 
 extern crate regex;
 #[macro_use] extern crate lazy_static;
@@ -23,10 +24,9 @@ use std::fmt;
 
 pub mod nametree;
 pub mod path;
-pub mod prefix;
 
 pub use self::nametree::*;
-pub use self::prefix::Prefix;
+pub use self::path::{Prefix, Path};
 
 
 /// Macro for constructing a [`Dentry`].
@@ -42,7 +42,8 @@ pub use self::prefix::Prefix;
 /// # Examples
 ///
 /// ```
-/// # #[macro_use] extern crate dtab;
+/// #![feature(try_from)]
+/// #[macro_use] extern crate dtab;
 /// # fn main() {
 /// use dtab::NameTree;
 ///
@@ -60,8 +61,8 @@ pub use self::prefix::Prefix;
 #[macro_export]
 macro_rules! dentry {
   ($src: expr => $dst: expr ) => ({
-    use std::str::FromStr;
-    $crate::Prefix::from_str($src)
+    use std::convert::TryFrom;
+    $crate::path::Prefix::try_from($src)
         .map(|src| $crate::Dentry {
                 prefix: src, dst: $dst
             })
@@ -74,7 +75,8 @@ macro_rules! dentry {
 /// # Examples
 ///
 /// ```
-/// # #[macro_use] extern crate dtab;
+/// #![feature(try_from)]
+/// #[macro_use] extern crate dtab;
 /// # fn main() {
 /// use dtab::NameTree;
 ///
@@ -96,15 +98,15 @@ macro_rules! dentry {
 macro_rules! dtab {
   ($($src: expr => $dst: expr ;)+) => (
     vec![ $(dentry!($src => $dst)),+ ].into_iter()
-        .collect::<Result<Vec<$crate::Dentry>,$crate::prefix::ParseElemErr>>()
+        .collect::<Result<Vec<$crate::Dentry>,$crate::path::LabelError>>()
         .map($crate::Dtab)
   )
 }
 /// A `dtab` (delegation table) comprises a sequence of delegation rules.
 #[derive(Debug, Clone, Serialize)]
-pub struct Dtab(pub Vec<Dentry>);
+pub struct Dtab<'a>(pub Vec<Dentry<'a>>);
 
-impl fmt::Display for Dtab {
+impl<'a> fmt::Display for Dtab<'a> {
     #[inline] fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         self.0.iter()
             .fold( Ok(())
@@ -116,14 +118,14 @@ impl fmt::Display for Dtab {
 }
 
 #[derive(Debug, Clone, Serialize)]
-pub struct Dentry {
-    #[serde(serialize_with ="prefix::serialize")]
-    pub prefix: Prefix
+pub struct Dentry<'prefix> {
+    #[serde(serialize_with ="path::prefix::serialize")]
+    pub prefix: Prefix<'prefix>
   , #[serde(serialize_with ="nametree::serialize")]
     pub dst: NameTree<String>
 }
 
-impl fmt::Display for Dentry {
+impl<'a> fmt::Display for Dentry<'a> {
     #[inline] fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{} => {};", self.prefix, self.dst)
     }
@@ -131,9 +133,9 @@ impl fmt::Display for Dentry {
 
 use std::{convert, ops};
 
-impl<R> ops::Shr<R> for Prefix
+impl<'a, R> ops::Shr<R> for Prefix<'a>
 where R: convert::Into<NameTree<String>> {
-    type Output = Dentry;
+    type Output = Dentry<'a>;
     #[inline] fn shr(self, rhs: R) -> Self::Output {
         Dentry { prefix: self, dst: rhs.into() }
     }

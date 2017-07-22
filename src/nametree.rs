@@ -20,11 +20,14 @@
 //! expression:
 //!
 //! ```
+//! #![feature(try_from)]
+//! # fn main() {
 //! use dtab::{NameTree, Prefix};
-//! use std::str::FromStr;
+//! use std::convert::TryFrom;
 //!
-//! let dentry = Prefix::from_str("/iceCreamStore").unwrap() >> "/smitten";
+//! let dentry = Prefix::try_from("/iceCreamStore").unwrap() >> "/smitten";
 //! assert_eq!("/iceCreamStore => /smitten;", &dentry.to_string());
+//! # }
 //! ```
 //!
 //! Take note of the following:
@@ -48,40 +51,49 @@
 //! becomes
 //!
 //! ```
+//! #![feature(try_from)]
+//! # fn main() {
 //! use dtab::{NameTree, Prefix};
-//! use std::str::FromStr;
+//! use std::convert::TryFrom;
 //!
-//! let dentry = Prefix::from_str("/iceCreamStore").unwrap() >>
+//! let dentry = Prefix::try_from("/iceCreamStore").unwrap() >>
 //!              (NameTree::from("/humphrys") | "/smitten");
 //! assert_eq!("/iceCreamStore => /humphrys | /smitten;", &dentry.to_string());
+//! # }
 //! ```
 //!
 //! These alternation expressions can have any number of alternates, as in:
 //!
 //! ```
+//! #![feature(try_from)]
+//! # fn main() {
 //! use dtab::{NameTree, Prefix};
-//! use std::str::FromStr;
+//! use std::convert::TryFrom;
 //!
 //! let dest = NameTree::from("/humphrys") | "/smitten" | "/birite"
 //!                   | "/three-twins";
-//! let dentry = Prefix::from_str("/iceCreamStore").unwrap() >> dest;
+//! let dentry = Prefix::try_from("/iceCreamStore").unwrap() >> dest;
 //! assert_eq!(
 //!   "/iceCreamStore => /humphrys | /smitten | /birite | /three-twins;"
 //! , &dentry.to_string()
 //! );
+//! # }
 //! ```
 //!
 //! Union expressions can be constructed using the `&` operator:
 //!
 //! ```
+//! #![feature(try_from)]
+//! # fn main() {
 //! use dtab::{NameTree, Prefix};
-//! use std::str::FromStr;
+//! use std::convert::TryFrom;
 //!
 //! let dest = NameTree::from("/smitten") & "/humphrys";
-//! let dentry = Prefix::from_str("/iceCreamStore").unwrap() >> dest;
+//! let dentry = Prefix::try_from("/iceCreamStore").unwrap() >> dest;
 //!
 //! assert_eq!( "/iceCreamStore => 0.5 * /smitten & 0.5 * /humphrys;"
 //!            , &dentry.to_string());
+//! # }
 //! ```
 //!
 //! Note that if no weight is supplied, the value of [`DEFAULT_WEIGHT`], 0.5,
@@ -90,14 +102,17 @@
 //! Weighted unions can be constructed using the `*` operator:
 //!
 //! ```
+//! #![feature(try_from)]
+//! # fn main() {
 //! use dtab::{NameTree, Prefix};
-//! use std::str::FromStr;
+//! use std::convert::TryFrom;
 //! use dtab::nametree::W;
 //!
 //! let dest = W(0.7) * "/smitten" & W(0.3) * "/humphrys";
-//! let dentry = Prefix::from_str("/iceCreamStore").unwrap() >> dest;
+//! let dentry = Prefix::try_from("/iceCreamStore").unwrap() >> dest;
 //! assert_eq!( "/iceCreamStore => 0.7 * /smitten & 0.3 * /humphrys;"
 //!            , &dentry.to_string());
+//! # }
 //! ```
 //!
 //! [`W()`] is a [newtype] used to allow the implementation of custom operators
@@ -109,18 +124,21 @@
 //! failure, and empty `NameTree` nodes, rather than leaf nodes:
 //!
 //! ```
+//! #![feature(try_from)]
+//! # fn main() {
 //! use dtab::{NameTree, Prefix};
-//! use std::str::FromStr;
+//! use std::convert::TryFrom;
 //!
-//! let dentry = Prefix::from_str("/iceCreamStore").unwrap() >>
+//! let dentry = Prefix::try_from("/iceCreamStore").unwrap() >>
 //!              (NameTree::from("~") | "/smitten");
 //! assert_eq!( "/iceCreamStore => ~ | /smitten;"
 //!            , &dentry.to_string());
 //!
-//! let dentry = Prefix::from_str("/iceCreamStore").unwrap() >>
+//! let dentry = Prefix::try_from("/iceCreamStore").unwrap() >>
 //!              (NameTree::from("/smitten") | "!");
 //! assert_eq!( "/iceCreamStore => /smitten | !;"
 //!            , &dentry.to_string());
+//! # }
 //! ```
 //!
 //! Note that this only works when the leaf type of the `NameTree` is `String`.
@@ -129,18 +147,21 @@
 //! explictly:
 //!
 //! ```
+//! #![feature(try_from)]
+//! # fn main() {
 //! use dtab::{NameTree, Prefix};
-//! use std::str::FromStr;
+//! use std::convert::TryFrom;
 //!
-//! let dentry = Prefix::from_str("/iceCreamStore").unwrap() >>
+//! let dentry = Prefix::try_from("/iceCreamStore").unwrap() >>
 //!             (NameTree::Neg | "/smitten");
 //! assert_eq!( "/iceCreamStore => ~ | /smitten;"
 //!            , &dentry.to_string());
 //!
-//! let dentry = Prefix::from_str("/iceCreamStore").unwrap() >>
+//! let dentry = Prefix::try_from("/iceCreamStore").unwrap() >>
 //!              (NameTree::from("/smitten") | NameTree::Fail);
 //! assert_eq!( "/iceCreamStore => /smitten | !;"
 //!            , &dentry.to_string());
+//! # }
 //! ```
 //!
 //! [`Dentry`]: ../struct.Dentry.html
@@ -355,7 +376,7 @@ mod tests {
 
 // mod parser {
 //   use super::NameTree;
-//   use std::str::FromStr;
+//   use std::convert::TryFrom;
 //
 //   named!{ weighted<&str, (f64, NameTree)>,
 //     do_parse!(w: map_res!(re_match!(r"[0-9]*\.?[0-9]+"), f64::from_str) >>

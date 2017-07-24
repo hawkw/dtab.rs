@@ -39,6 +39,8 @@ impl<'t> fmt::Display for Elem<'t> {
     }
 }
 
+
+#[cfg(feature = "parse")]
 impl<'t> convert::TryFrom<&'t str> for Elem<'t> {
     type Error = LabelError<'t>;
     fn try_from(value: &'t str) -> Result<Self, Self::Error> {
@@ -49,6 +51,7 @@ impl<'t> convert::TryFrom<&'t str> for Elem<'t> {
     }
 }
 
+#[cfg(feature = "parse")]
 impl<'t> convert::TryFrom<&'t str> for Prefix<'t>
 //where A: convert::AsRef<str>
 //    , A: 't
@@ -68,8 +71,10 @@ mod tests {
     use super::*;
     use ::path::Label;
 
+    #[cfg(feature = "parse")]
     use std::convert::TryFrom;
 
+    #[cfg(feature = "parse")]
     #[test]
     fn test_parse_1() {
         let prefix = Prefix::try_from("/foo/bar/baz").unwrap();
@@ -80,6 +85,8 @@ mod tests {
                                ])
                   )
     }
+
+    #[cfg(feature = "parse")]
     #[test]
     fn test_parse_2() {
         let prefix = Prefix::try_from("/foo/*/bar/baz").unwrap();
@@ -91,6 +98,8 @@ mod tests {
                                ])
                   )
     }
+
+    #[cfg(feature = "parse")]
     #[test]
     fn test_parse_empty() {
         let prefix = Prefix::try_from("/").unwrap();

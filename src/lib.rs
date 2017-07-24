@@ -5,14 +5,21 @@
 //! dtabs cannot be represented, rather than just representing them as strings.
 //!
 //! [dtab]: https://linkerd.io/in-depth/dtabs/
-#![feature(try_from)]
-#![feature(ascii_ext)]
+#![cfg_attr(feature = "parse", feature(try_from))]
+#![cfg_attr(feature = "parse", feature(ascii_ext))]
+
 #[cfg(test)]
-#[macro_use] extern crate pretty_assertions;
+#[macro_use]
+extern crate pretty_assertions;
 
+#[cfg(feature = "parse")]
 extern crate regex;
-#[macro_use] extern crate lazy_static;
 
+#[cfg(feature = "parse")]
+#[macro_use]
+extern crate lazy_static;
+
+#[cfg(feature = "serde" )]
 extern crate serde;
 #[macro_use] extern crate serde_derive;
 //
@@ -119,9 +126,11 @@ impl<'a> fmt::Display for Dtab<'a> {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct Dentry<'prefix> {
-    #[serde(serialize_with ="path::prefix::serialize")]
+    #[cfg_attr( feature = "serde"
+             , serde(serialize_with ="path::prefix::serialize"))]
     pub prefix: Prefix<'prefix>
-  , #[serde(serialize_with ="nametree::serialize")]
+  , #[cfg_attr( feature = "serde"
+              , serde(serialize_with ="nametree::serialize"))]
     pub dst: NameTree<String>
 }
 

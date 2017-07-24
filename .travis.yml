@@ -4,7 +4,9 @@ rust:
   - beta
   - nightly
 
-script: cargo test
+script: |
+  travis-cargo build &&
+  travis-cargo test
 
 jobs:
   include:
@@ -18,6 +20,9 @@ jobs:
             - cmake
             - gcc
             - binutils-dev
+      install: |
+        pip install 'travis-cargo<0.2' --user &&
+        export PATH=$HOME/.local/bin:$PATH
       after_success: |
         wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
         tar xzf master.tar.gz &&
@@ -33,8 +38,10 @@ jobs:
         bash <(curl -s https://codecov.io/bash) &&
         echo "Uploaded code coverage"
     - stage: docs
-      script: cargo doc
-      install: skip
+      script: travis-cargo doc
+      install: |
+        pip install 'travis-cargo<0.2' --user &&
+        export PATH=$HOME/.local/bin:$PATH
       deploy:
         provider:  pages
         skip_cleanup: true

@@ -283,7 +283,9 @@ where R: convert::Into<NameTree<String>> {
     }
 }
 
+#[cfg(feature = "serialize")]
 use serde::ser::{Serializer};
+#[cfg(feature = "serialize")]
 pub fn serialize<S>(name_tree: &NameTree<String>, serializer: S)
                     -> Result<S::Ok, S::Error>
 where S: Serializer {

@@ -1,5 +1,9 @@
 use std::{convert, error, fmt, iter, ops, str, };
+
+#[cfg(feature = "parse")]
 use std::ascii::AsciiExt;
+
+#[cfg(feature = "parse")]
 use regex::Regex;
 
 pub mod prefix;
@@ -8,21 +12,28 @@ pub use self::prefix::Prefix;
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Label<'t>(pub &'t str);
 
+
 #[derive(Copy, Clone, Debug)]
 pub enum LabelError<'a> {
     InvalidCharacter { ch: &'a str, at: usize, elem: &'a str },
     NonAscii { ch: &'a str, at: usize },
 }
 
+
 impl<'a> LabelError<'a> {
-    #[inline] fn non_ascii(s: &'a str) -> Result<&'a str, Self> {
+
+    #[cfg(feature = "parse")]
+    #[inline]
+    fn non_ascii(s: &'a str) -> Result<&'a str, Self> {
         s.chars().position(|c| !c.is_ascii())
          .map(|i| Err(LabelError::NonAscii { ch: &s[i .. i + 1], at: i }) )
          .unwrap_or_else(|| Ok(s))
 
     }
 
-    #[inline] fn invalid_char(s: &'a str) -> Result<&'a str, Self> {
+    #[cfg(feature = "parse")]
+    #[inline]
+    fn invalid_char(s: &'a str) -> Result<&'a str, Self> {
         lazy_static! {
             static ref INVALID_REGEX: Regex =
                 Regex::new("([^0-9A-Za-z:.#$%-_])")
@@ -37,8 +48,14 @@ impl<'a> LabelError<'a> {
     }
 }
 
+
+#[cfg(feature = "parse")]
 impl<'t> convert::TryFrom<&'t str> for Label<'t> {
+
+    #[cfg(feature = "parse")]
     type Error = LabelError<'t>;
+
+    #[cfg(feature = "parse")]
     fn try_from(s: &'t str) -> Result<Self, Self::Error> {
         use regex::Regex;
         lazy_static! {
@@ -60,11 +77,11 @@ impl<'t> convert::TryFrom<&'t str> for Label<'t> {
 pub struct Path<'t>(pub Vec<&'t [u8]>);
 
 impl<'t> Path<'t> {
-    pub fn append<'b, T>(&mut self, path: T) -> Result<&mut Self, LabelError>
+    pub fn append<'b, T>(&mut self, path: T) -> &mut Self
     where T: convert::Into<&'b [u8]>
         , 'b: 't {
         self.0.push(path.into());
-        Ok(self)
+        self
     }
 }
 
@@ -86,8 +103,7 @@ where R: convert::Into<&'b [u8]>
     {
     type Output = Self;
     fn div(self, rhs: R) -> Self {
-        self.append(rhs)
-            .expect("Error appending to path from iterator")
+        self.append(rhs); self
     }
 
 }
@@ -99,8 +115,7 @@ where T: convert::Into<&'b [u8]>
     fn extend<I>(&mut self, iter: I)
     where I: iter::IntoIterator<Item=T> {
         for elem in iter {
-            self.append(elem)
-                .expect("Error extending path from iterator");
+            self.append(elem);
         }
     }
 }
@@ -144,8 +159,7 @@ impl <'a> fmt::Display for Path<'a> {
     }
 }
 
-
-
+#[cfg(feature = "parse")]
 impl<'t> fmt::Display for LabelError<'t> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
@@ -164,6 +178,7 @@ impl<'t> fmt::Display for LabelError<'t> {
     }
 }
 
+#[cfg(feature = "parse")]
 impl<'a> error::Error for LabelError<'a> {
     fn description(&self) -> &str {
         match *self {

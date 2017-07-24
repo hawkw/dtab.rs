@@ -19,7 +19,7 @@
 //! We could construct the corresponding [`Dentry`] using the following Rust
 //! expression:
 //!
-//! ```
+//! ```ignore
 //! #![feature(try_from)]
 //! # fn main() {
 //! use dtab::{NameTree, Prefix};
@@ -50,7 +50,7 @@
 //!
 //! becomes
 //!
-//! ```
+//! ```ignore
 //! #![feature(try_from)]
 //! # fn main() {
 //! use dtab::{NameTree, Prefix};
@@ -64,7 +64,7 @@
 //!
 //! These alternation expressions can have any number of alternates, as in:
 //!
-//! ```
+//! ```ignore
 //! #![feature(try_from)]
 //! # fn main() {
 //! use dtab::{NameTree, Prefix};
@@ -82,7 +82,7 @@
 //!
 //! Union expressions can be constructed using the `&` operator:
 //!
-//! ```
+//! ```ignore
 //! #![feature(try_from)]
 //! # fn main() {
 //! use dtab::{NameTree, Prefix};
@@ -101,7 +101,7 @@
 //!
 //! Weighted unions can be constructed using the `*` operator:
 //!
-//! ```
+//! ```ignore
 //! #![feature(try_from)]
 //! # fn main() {
 //! use dtab::{NameTree, Prefix};
@@ -123,7 +123,7 @@
 //! Finally, the strings `"~"`, `"!"`, and `"$"` will convert into the negation,
 //! failure, and empty `NameTree` nodes, rather than leaf nodes:
 //!
-//! ```
+//! ```ignore
 //! #![feature(try_from)]
 //! # fn main() {
 //! use dtab::{NameTree, Prefix};
@@ -146,7 +146,7 @@
 //! The `NameTree` variants `Neg`, `Fail`, and `Empty` can also be used
 //! explictly:
 //!
-//! ```
+//! ```ignore
 //! #![feature(try_from)]
 //! # fn main() {
 //! use dtab::{NameTree, Prefix};

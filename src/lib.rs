@@ -19,9 +19,12 @@ extern crate regex;
 #[macro_use]
 extern crate lazy_static;
 
-#[cfg(feature = "serde" )]
+#[cfg(feature = "serialize" )]
 extern crate serde;
-#[macro_use] extern crate serde_derive;
+
+#[cfg(feature = "serialize" )]
+#[macro_use]
+extern crate serde_derive;
 //
 // #[macro_use] extern crate nom;
 
@@ -48,7 +51,7 @@ pub use self::path::{Prefix, Path};
 ///
 /// # Examples
 ///
-/// ```
+/// ```ignore
 /// #![feature(try_from)]
 /// #[macro_use] extern crate dtab;
 /// # fn main() {
@@ -66,6 +69,7 @@ pub use self::path::{Prefix, Path};
 /// ```
 ///
 #[macro_export]
+#[cfg(feature = "parse")]
 macro_rules! dentry {
   ($src: expr => $dst: expr ) => ({
     use std::convert::TryFrom;
@@ -81,7 +85,7 @@ macro_rules! dentry {
 ///
 /// # Examples
 ///
-/// ```
+/// ```ignore
 /// #![feature(try_from)]
 /// #[macro_use] extern crate dtab;
 /// # fn main() {
@@ -102,6 +106,7 @@ macro_rules! dentry {
 ///
 /// [`Dtab`]: type.Dtab.html
 #[macro_export]
+#[cfg(feature = "parse")]
 macro_rules! dtab {
   ($($src: expr => $dst: expr ;)+) => (
     vec![ $(dentry!($src => $dst)),+ ].into_iter()
@@ -124,12 +129,13 @@ impl<'a> fmt::Display for Dtab<'a> {
     }
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
 pub struct Dentry<'prefix> {
-    #[cfg_attr( feature = "serde"
-             , serde(serialize_with ="path::prefix::serialize"))]
+    #[cfg_attr( feature = "serialize"
+              , serde(serialize_with ="path::prefix::serialize"))]
     pub prefix: Prefix<'prefix>
-  , #[cfg_attr( feature = "serde"
+  , #[cfg_attr( feature = "serialize"
               , serde(serialize_with ="nametree::serialize"))]
     pub dst: NameTree<String>
 }

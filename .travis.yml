@@ -4,6 +4,10 @@ rust:
   - beta
   - nightly
 
+before_script: |
+  pip install 'travis-cargo<0.2' --user &&
+  export PATH=$HOME/.local/bin:$PATH
+
 script: |
   travis-cargo build &&
   travis-cargo test
@@ -20,9 +24,6 @@ jobs:
             - cmake
             - gcc
             - binutils-dev
-      install: |
-        pip install 'travis-cargo<0.2' --user &&
-        export PATH=$HOME/.local/bin:$PATH
       after_success: |
         wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
         tar xzf master.tar.gz &&
@@ -39,9 +40,6 @@ jobs:
         echo "Uploaded code coverage"
     - stage: docs
       script: travis-cargo doc
-      install: |
-        pip install 'travis-cargo<0.2' --user &&
-        export PATH=$HOME/.local/bin:$PATH
       deploy:
         provider:  pages
         skip_cleanup: true

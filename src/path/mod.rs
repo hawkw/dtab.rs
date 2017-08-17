@@ -9,6 +9,14 @@ use regex::Regex;
 pub mod prefix;
 pub use self::prefix::Prefix;
 
+/// A "label" is an ASCII string constituting a single path element.
+///
+/// Labels follow the lexical conventions of DNS, plus a few
+/// extensions:
+/// > protocols mandate that component hostname labels
+/// > may contain only the ASCII letters 'a' through 'z' (in a
+/// > case-insensitive manner), the digits '0' through '9', and the
+/// > hyphen ('-')."
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Label<'t>(pub &'t str);
 
@@ -18,7 +26,6 @@ pub enum LabelError<'a> {
     InvalidCharacter { ch: &'a str, at: usize, elem: &'a str },
     NonAscii { ch: &'a str, at: usize },
 }
-
 
 impl<'a> LabelError<'a> {
 
@@ -120,15 +127,6 @@ where T: convert::Into<&'b [u8]>
     }
 }
 
-//impl<'a, 'b, I> convert::From<I> for Path<'a>
-//where I: convert::Into<&'b [u8]>
-//    , 'b: 'a
-//    {
-//    #[inline] fn from(i: I) -> Path<'a> {
-//        Path(vec![i.into()])
-//    }
-//}
-
 impl<'a, A> convert::From<&'a A> for Path<'a>
 where A: convert::AsRef<[u8]>
     , A: 'a {
@@ -136,15 +134,6 @@ where A: convert::AsRef<[u8]>
         Path(vec![bytes.as_ref()])
     }
 }
-//
-//impl<'a, A> convert::From<&'a A> for Path<'a>
-//where A: convert::AsRef<[u8]>
-//    , A: 'a {
-//    #[inline] fn from(bytes: &'a A) -> Path<'a> {
-//        Path(vec![bytes.as_ref()])
-//    }
-//}
-
 
 impl <'a> fmt::Display for Path<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

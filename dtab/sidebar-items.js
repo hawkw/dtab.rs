@@ -1,0 +1,1 @@
+initSidebarItems({"macro":[["dentry","Macro for constructing a [`Dentry`]."],["dtab","Convenience macro for making [`Dtab`]s."]],"mod":[["nametree","Finagle/linkerd Name Trees."],["path",""]],"struct":[["Dentry",""],["Dtab","A `dtab` (delegation table) comprises a sequence of delegation rules."]]});

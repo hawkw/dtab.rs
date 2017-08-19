@@ -180,13 +180,23 @@ pub const DEFAULT_WEIGHT: f64 = 0.5;
 /// Name trees represent a composite name whose interpretation is subject to
 /// Finagle's interpretation rules
 #[derive(Clone, PartialEq, Debug)]
-pub enum NameTree<T> { Leaf(T)
-                     , Union(Weighted<T>, Weighted<T>)
-                     , Alt(Box<NameTree<T>>, Box<NameTree<T>>)
-                     , Neg
-                     , Empty
-                     , Fail
-                     }
+pub enum NameTree<T> {
+    /// A `Leaf` represents a `T`-typed leaf node
+    Leaf(T)
+  , /// `Union` nodes represent the union of several trees; a destination is
+    /// reached by load-balancing over the sub-trees.
+    Union(Weighted<T>, Weighted<T>)
+  , /// `Alt` nodes represent a fail-over relationship between several trees;
+    /// the first successful tree is picked as the destination. When
+    /// the tree-list is empty, Alt-nodes evaluate to Empty.
+    Alt(Box<NameTree<T>>, Box<NameTree<T>>)
+  , /// `Neg` represents a negative location; no destination exists here.
+    Neg
+  , /// `Empty` trees represent an empty location: it exists but is uninhabited
+    /// at this time.
+    Empty
+  , Fail
+}
 
 impl<T> NameTree<T> {
     #[inline] pub fn weighted(self, weight: f64) -> Weighted<T> {
@@ -220,6 +230,7 @@ where T: fmt::Display {
     }
 }
 
+/// A weighted NameTree expression
 #[derive(Clone, PartialEq, Debug)]
 pub struct Weighted<T> { weight: f64, tree: Box<NameTree<T>> }
 
@@ -231,14 +242,13 @@ where T: fmt::Display {
     }
 
 }
-//
-// pub trait NameTree {
-// }
-// pub struct Alt(Box<NameTree>, Box<NameTree>);
-// impl NameTree for Alt {}
 
+/// Newtype to allow floats to be used as weights in the NameTree DSL.
+///
+/// This has a short name so you don't have to type `NameTree::Weight()`
+/// over and over again in DSL expressions.
+#[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
 pub struct W(pub f64);
-
 
 impl<T, R> ops::BitAnd<R> for NameTree<T>
 where R: convert::Into<NameTree<T>> {
@@ -285,6 +295,7 @@ where R: convert::Into<NameTree<String>> {
 
 #[cfg(feature = "serialize")]
 use serde::ser::{Serializer};
+
 #[cfg(feature = "serialize")]
 pub fn serialize<S>(name_tree: &NameTree<String>, serializer: S)
                     -> Result<S::Ok, S::Error>
@@ -298,8 +309,6 @@ mod tests {
     use super::*;
     use super::NameTree::*;
     use std::convert::From;
-
-
 
     #[test]
     fn simple_alt() {

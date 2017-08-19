@@ -1,6 +1,5 @@
-use std::{fmt, ops, convert};
-
-use super::{Label, LabelError};
+use std::fmt;
+use super::Label;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Prefix<'t>(Vec<Elem<'t>>);
@@ -53,8 +52,6 @@ impl<'t> convert::TryFrom<&'t str> for Elem<'t> {
 
 #[cfg(feature = "parse")]
 impl<'t> convert::TryFrom<&'t str> for Prefix<'t>
-//where A: convert::AsRef<str>
-//    , A: 't
     {
     type Error = LabelError<'t>;
     fn try_from(value: &'t str) -> Result<Self, Self::Error> {
